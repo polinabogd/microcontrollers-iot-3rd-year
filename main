@@ -11,31 +11,72 @@
 */
 #include "project.h"
 
+#define RED 0b100
+#define YELLOW 0b010
+#define GREEN 0b001
+#define RED_YELLOW 0b110
+#define NO_COLOR 0b000
+int state = 0;
+inline void Algo1();
+inline void Algo2();
+
+CY_ISR(button_int_interrupt){
+    
+    state+=1;
+    
+    pin_button_ClearInterrupt();
+}
+
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
- 
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-    uint8 registerValue;
-    led_Write(0);
     
+    button_int_StartEx(button_int_interrupt);
+
     for(;;)
     {
-        registerValue = Status_Reg_1_Read();
-        if ((registerValue == 0b11100)||(registerValue == 0b10110) 
-        || (registerValue == 0b01110)|| (registerValue == 0b10101)
-        || (registerValue == 0b01101)||(registerValue == 0b00111)
-        || (registerValue == 0b01100)
-            )
-        {
-            led_Write(1);
-        }else{
-            led_Write(0);
-        }
-            
+        if(state%2==1){
+        Algo1();
     }
-        /* Place your application code here. */
+    else if(state%2==0){
+        Algo2();
+    }
+    }
 }
 
-
-/* [] END OF FILE */
+inline void Algo1(){
+    Control_Reg_Write(RED);
+    CyDelay(6000);
+    Control_Reg_Write(RED_YELLOW);
+    CyDelay(2000);
+    Control_Reg_Write(GREEN);
+    CyDelay(5000);
+    Control_Reg_Write(NO_COLOR);
+    CyDelay(1000);
+    Control_Reg_Write(GREEN);
+    CyDelay(1000);
+    Control_Reg_Write(NO_COLOR);
+    CyDelay(1000);
+    Control_Reg_Write(GREEN);
+    CyDelay(1000);
+    Control_Reg_Write(YELLOW);
+    CyDelay(2000);
+}
+inline void Algo2(){
+    Control_Reg_Write(GREEN);
+    CyDelay(2000);
+    Control_Reg_Write(NO_COLOR);
+    CyDelay(1000);
+    Control_Reg_Write(GREEN);
+    CyDelay(1000);
+    Control_Reg_Write(NO_COLOR);
+    CyDelay(1000);
+    Control_Reg_Write(GREEN);
+    CyDelay(1000);
+    Control_Reg_Write(YELLOW);
+    CyDelay(2000);
+    Control_Reg_Write(RED);
+    CyDelay(9000);
+    Control_Reg_Write(RED_YELLOW);
+    CyDelay(2000);
+}
